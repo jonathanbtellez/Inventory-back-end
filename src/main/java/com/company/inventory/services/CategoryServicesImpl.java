@@ -120,15 +120,26 @@ public class CategoryServicesImpl implements ICategoryServices {
 				return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.NOT_FOUND);
 			}
 			
-		}catch(
-
-	Exception e)
-	{
+		}catch(Exception e)	{
 			rest.setMetadata("Respuesta fail", "-1", "Fail to update the category");
 			e.getStackTrace();
 			return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.INTERNAL_SERVER_ERROR);
 		}return new ResponseEntity<CategoryResponseRest>(rest,HttpStatus.OK);
 
-}
+	}
+	
+	@Transactional
+	public ResponseEntity<CategoryResponseRest> delete(Long id) {
+		CategoryResponseRest rest = new CategoryResponseRest();
+
+		try {
+			categoryDao.deleteById(id);
+			rest.setMetadata("Success response", "00", "Success, category deleted");
+		} catch (Exception e) {
+			rest.setMetadata("Respuesta fail", "-1", "Fail at delete category");
+			e.getStackTrace();
+			return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.OK);	}
 
 }
