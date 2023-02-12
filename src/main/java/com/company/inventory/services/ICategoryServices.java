@@ -13,4 +13,6 @@ public interface ICategoryServices {
 	
 	public ResponseEntity<CategoryResponseRest> save(Category category);
 	
+	public ResponseEntity<CategoryResponseRest> updateCategory(Category category, Long id);
+	
 }

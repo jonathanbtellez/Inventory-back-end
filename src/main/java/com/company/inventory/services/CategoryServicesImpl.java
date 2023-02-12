@@ -39,23 +39,23 @@ public class CategoryServicesImpl implements ICategoryServices {
 
 	@Transactional(readOnly = true)
 	public ResponseEntity<CategoryResponseRest> searchById(Long id) {
-		
+
 		CategoryResponseRest rest = new CategoryResponseRest();
 		List<Category> list = new ArrayList<Category>();
-		
+
 		try {
-			
+
 			Optional<Category> category = categoryDao.findById(id);
-			
+
 			if (category.isPresent()) {
 				list.add(category.get());
 				rest.getCategoryResponse().setCategory(list);
 				rest.setMetadata("Response ok", "00", "Success, Category found");
-			}else {
+			} else {
 				rest.setMetadata("Respuesta fail", "-1", "Fail, category not found");
 				return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.NOT_FOUND);
 			}
-			
+
 		} catch (Exception e) {
 			rest.setMetadata("Respuesta fail", "-1", "Fail in response to find by id");
 			e.getStackTrace();
@@ -64,24 +64,24 @@ public class CategoryServicesImpl implements ICategoryServices {
 		return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.OK);
 
 	}
-	
+
 	@Transactional
 	public ResponseEntity<CategoryResponseRest> save(Category category) {
 		CategoryResponseRest rest = new CategoryResponseRest();
 		List<Category> list = new ArrayList<Category>();
-		
+
 		try {
-			
+
 			Category categorySaved = categoryDao.save(category);
 			if (categorySaved != null) {
 				list.add(categorySaved);
 				rest.getCategoryResponse().setCategory(list);
 				rest.setMetadata("Respuesta success", "00", "Success, category was saved");
-			}else {
+			} else {
 				rest.setMetadata("Respuesta fail", "-1", "Fail, category not saved");
 				return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.BAD_REQUEST);
 			}
-			
+
 		} catch (Exception e) {
 			rest.setMetadata("Respuesta fail", "-1", "Fail to save the category");
 			e.getStackTrace();
@@ -89,5 +89,46 @@ public class CategoryServicesImpl implements ICategoryServices {
 		}
 		return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.OK);
 	}
+
+	@Transactional
+	public ResponseEntity<CategoryResponseRest> updateCategory(Category category, Long id) {
+		CategoryResponseRest rest = new CategoryResponseRest();
+		List<Category> list = new ArrayList<Category>();
+		
+		try {
+			
+			Optional<Category> categorySearch = categoryDao.findById(id);
+			
+			if(categorySearch.isPresent()) {
+				// If there is a result we going to update this
+				categorySearch.get().setName(category.getName());
+				categorySearch.get().setDescription(category.getDescription());
+
+				Category categoryUpdated = categoryDao.save(categorySearch.get());
+				
+				if (categoryUpdated != null) {
+					list.add(categoryUpdated);
+					rest.getCategoryResponse().setCategory(list);
+					rest.setMetadata("Success response", "00", "Success, category update");
+				}else {
+					rest.setMetadata("Respuesta fail", "-1", "Fail, category not update");
+					return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.BAD_REQUEST);
+				}
+				
+			}else {
+				rest.setMetadata("Respuesta fail", "-1", "Fail, category not update");
+				return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.NOT_FOUND);
+			}
+			
+		}catch(
+
+	Exception e)
+	{
+			rest.setMetadata("Respuesta fail", "-1", "Fail to update the category");
+			e.getStackTrace();
+			return new ResponseEntity<CategoryResponseRest>(rest, HttpStatus.INTERNAL_SERVER_ERROR);
+		}return new ResponseEntity<CategoryResponseRest>(rest,HttpStatus.OK);
+
+}
 
 }
