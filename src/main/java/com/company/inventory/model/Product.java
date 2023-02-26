@@ -2,6 +2,7 @@ package com.company.inventory.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
 import jakarta.persistence.Basic;
@@ -32,7 +33,7 @@ public class Product implements Serializable{
 	private int quantity;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JsonIncludeProperties({"hibernateLazyInitializer", "handler"})
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private Category category;
 	
 	@Lob

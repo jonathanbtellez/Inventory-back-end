@@ -7,12 +7,14 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.company.inventory.dao.ICategoryDao;
 import com.company.inventory.dao.IProductDao;
 import com.company.inventory.model.Category;
 import com.company.inventory.model.Product;
 import com.company.inventory.response.ProductResponseRest;
+import com.company.inventory.util.Util;
 
 @Service
 public class ProductServiceImpl implements IProductService {
@@ -28,11 +30,9 @@ public class ProductServiceImpl implements IProductService {
 		this.productDao = productDao;
 	}
 
-
-
+	@Transactional
 	public ResponseEntity<ProductResponseRest> save(Product product, Long categoryId) {
 		
-		System.out.println(categoryId);
 		ProductResponseRest responseRest = new ProductResponseRest();
 		List<Product> list = new ArrayList<Product>();
 		
@@ -74,6 +74,42 @@ public class ProductServiceImpl implements IProductService {
 		}
 		
 		return new ResponseEntity<ProductResponseRest>(responseRest, HttpStatus.OK);
+	}
+	
+	@Transactional(readOnly = true)
+	public ResponseEntity<ProductResponseRest> searchById(Long id) {
+		
+		ProductResponseRest responseRest = new ProductResponseRest();
+		List<Product> list = new ArrayList<Product>();
+		
+		try {
+			// Search product by id
+			Optional<Product> product = productDao.findById(id);
+			if(product.isPresent()) {
+			
+				byte[] imagenDescompressed = Util.decompressZLib(product.get().getPicture());
+				product.get().setPicture(imagenDescompressed);
+				list.add(product.get());
+				responseRest.getProduct().setProducts(list);
+				System.out.println(responseRest.getProduct());
+				responseRest.setMetadata("Success Response", "00", "Product was found");
+				return new ResponseEntity<ProductResponseRest>(responseRest, HttpStatus.OK);
+				
+			}else {
+			
+				responseRest.setMetadata("Fail Response", "-1", "Product not found");
+				return new ResponseEntity<ProductResponseRest>(responseRest, HttpStatus.NOT_FOUND);				
+			
+			}
+		
+		} catch (Exception e) {
+			
+			e.getStackTrace();
+			responseRest.setMetadata("Fail Response", "-1", "Fail to search product");
+			return new ResponseEntity<ProductResponseRest>(responseRest, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		}
+		
 	}
 
 }
