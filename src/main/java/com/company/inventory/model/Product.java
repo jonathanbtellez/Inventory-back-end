@@ -3,7 +3,6 @@ package com.company.inventory.model;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
